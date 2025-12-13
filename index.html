@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Pessoal</title>
+    <style>
+        /* ===== RESET E VARIÁVEIS ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== ÁREA DE AÇÕES ===== */
+        .actions {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* ===== BOTÕES ===== */
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-2px);
+        }
+
+        /* ===== BOARD (COLUNAS) ===== */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .column {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px var(--shadow);
+            min-height: 400px;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .column-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .column-count {
+            background: var(--bg-main);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Cores das colunas */
+        .column-todo .column-header { border-color: var(--danger); }
+        .column-todo .column-title { color: var(--danger); }
+
+        .column-doing .column-header { border-color: var(--warning); }
+        .column-doing .column-title { color: var(--warning); }
+
+        .column-done .column-header { border-color: var(--success); }
+        .column-done .column-title { color: var(--success); }
+
+        /* ===== TAREFAS (CARDS) ===== */
+        .tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task {
+            background: var(--bg-main);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+            cursor: grab;
+        }
+
+        .task:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .task:active {
+            cursor: grabbing;
+        }
+
+        .task-content {
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            flex: 1;
+            min-width: fit-content;
+        }
+
+        /* ===== MENSAGENS DE ESTADO ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        footer strong {
+            color: var(--primary);
+        }
+
+        /* ===== INPUT FILE (ESCONDIDO) ===== */
+        #importFile {
+            display: none;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .board {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .input-group {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>📋 Kanban Pessoal</h1>
+            <p class="subtitle">Organize suas tarefas de forma simples e eficiente</p>
+        </header>
+
+        <!-- AÇÕES -->
+        <div class="actions">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    placeholder="Digite uma nova tarefa..."
+                    autocomplete="off"
+                >
+                <button class="btn-primary" onclick="addTask()">
+                    ➕ Adicionar
+                </button>
+            </div>
+            
+            <button class="btn-success" onclick="exportBackup()">
+                💾 Exportar Backup
+            </button>
+            
+            <button class="btn-secondary" onclick="document.getElementById('importFile').click()">
+                📥 Importar Backup
+            </button>
+            
+            <input 
+                type="file" 
+                id="importFile" 
+                accept=".json"
+                onchange="importBackup(event)"
+            >
+        </div>
+
+        <!-- BOARD (COLUNAS) -->
+        <div class="board">
+            <!-- COLUNA: A FAZER -->
+            <div class="column column-todo">
+                <div class="column-header">
+                    <div class="column-title">
+                        🔴 A Fazer
+                        <span class="column-count" id="countTodo">0</span>
+                    </div>
+                </div>
+                <div class="tasks" id="todo"></div>
+            </div>
+
+            <!-- COLUNA: EM ANDAMENTO -->
+            <div class="column column-doing">
+                <div class="column-header">
+                    <div class="column-title">
+                        🟡 Em Andamento
+                        <span class="column-count" id="countDoing">0</span>
+                    </div>
+                </div>
+                <div class="tasks" id="doing"></div>
+            </div>
+
+            <!-- COLUNA: CONCLUÍDO -->
+            <div class="column column-done">
+                <div class="column-header">
+                    <div class="column-title">
+                        🟢 Concluído
+                        <span class="column-count" id="countDone">0</span>
+                    </div>
+                </div>
+                <div class="tasks" id="done"></div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>
+                <strong>💡 Importante:</strong> 
+                Os dados são salvos apenas no seu navegador. 
+                Faça backups regulares para não perder suas tarefas!
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ===== CONSTANTES E CONFIGURAÇÃO =====
+        const STORAGE_KEY = 'kanban_tasks';
+        
+        // Estrutura de dados do Kanban
+        let kanbanData = {
+            todo: [],
+            doing: [],
+            done: []
+        };
+
+        // ===== INICIALIZAÇÃO =====
+        // Carrega os dados ao abrir a página
+        window.onload = function() {
+            loadData();
+            renderAllColumns();
+            
+            // Permite adicionar tarefa com Enter
+            document.getElementById('taskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+        };
+
+        // ===== PERSISTÊNCIA DE DADOS =====
+        
+        /**
+         * Carrega os dados do localStorage
+         */
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    kanbanData = JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                alert('⚠️ Erro ao carregar dados salvos');
+            }
+        }
+
+        /**
+         * Salva os dados no localStorage
+         */
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(kanbanData));
+            } catch (error) {
+                console.error('Erro ao salvar dados:', error);
+                alert('⚠️ Erro ao salvar dados');
+            }
+        }
+
+        // ===== GERENCIAMENTO DE TAREFAS =====
+
+        /**
+         * Adiciona uma nova tarefa na coluna "A Fazer"
+         */
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (text === '') {
+                alert('⚠️ Digite uma tarefa antes de adicionar');
+                input.focus();
+                return;
+            }
+
+            // Cria objeto da tarefa com ID único
+            const task = {
+                id: Date.now(),
+                text: text,
+                createdAt: new Date().toISOString()
+            };
+
+            // Adiciona na coluna "todo"
+            kanbanData.todo.push(task);
+            
+            // Salva e atualiza interface
+            saveData();
+            renderColumn('todo');
+            
+            // Limpa o input
+            input.value = '';
+            input.focus();
+        }
+
+        /**
+         * Move uma tarefa entre colunas
+         */
+        function moveTask(taskId, fromColumn, toColumn) {
+            // Encontra a tarefa na coluna de origem
+            const taskIndex = kanbanData[fromColumn].findIndex(t => t.id === taskId);
+            
+            if (taskIndex === -1) {
+                console.error('Tarefa não encontrada');
+                return;
+            }
+
+            // Remove da coluna de origem
+            const [task] = kanbanData[fromColumn].splice(taskIndex, 1);
+            
+            // Adiciona na coluna de destino
+            kanbanData[toColumn].push(task);
+            
+            // Salva e atualiza interface
+            saveData();
+            renderColumn(fromColumn);
+            renderColumn(toColumn);
+        }
+
+        /**
+         * Remove uma tarefa
+         */
+        function deleteTask(taskId, column) {
+            if (!confirm('🗑️ Tem certeza que deseja excluir esta tarefa?')) {
+                return;
+            }
+
+            // Remove a tarefa da coluna
+            kanbanData[column] = kanbanData[column].filter(t => t.id !== taskId);
+            
+            // Salva e atualiza interface
+            saveData();
+            renderColumn(column);
+        }
+
+        // ===== RENDERIZAÇÃO DA INTERFACE =====
+
+        /**
+         * Renderiza todas as colunas
+         */
+        function renderAllColumns() {
+            renderColumn('todo');
+            renderColumn('doing');
+            renderColumn('done');
+        }
+
+        /**
+         * Renderiza uma coluna específica
+         */
+        function renderColumn(column) {
+            const columnElement = document.getElementById(column);
+            const tasks = kanbanData[column];
+            
+            // Atualiza contador
+            document.getElementById(`count${capitalize(column)}`).textContent = tasks.length;
+            
+            // Se não há tarefas, mostra mensagem vazia
+            if (tasks.length === 0) {
+                columnElement.innerHTML = `
+                    <div class="empty-state">
+                        <p>Nenhuma tarefa</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Renderiza as tarefas
+            columnElement.innerHTML = tasks.map(task => createTaskHTML(task, column)).join('');
+        }
+
+        /**
+         * Cria o HTML de uma tarefa
+         */
+        function createTaskHTML(task, column) {
+            const buttons = createTaskButtons(task.id, column);
+            
+            return `
+                <div class="task">
+                    <div class="task-content">${escapeHTML(task.text)}</div>
+                    <div class="task-actions">
+                        ${buttons}
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Cria os botões de ação de uma tarefa
+         */
+        function createTaskButtons(taskId, column) {
+            let buttons = [];
+
+            // Botão de mover para trás
+            if (column === 'doing') {
+                buttons.push(`
+                    <button class="task-btn btn-secondary" onclick="moveTask(${taskId}, 'doing', 'todo')">
+                        ⬅️ Voltar
+                    </button>
+                `);
+            } else if (column === 'done') {
+                buttons.push(`
+                    <button class="task-btn btn-secondary" onclick="moveTask(${taskId}, 'done', 'doing')">
+                        ⬅️ Voltar
+                    </button>
+                `);
+            }
+
+            // Botão de mover para frente
+            if (column === 'todo') {
+                buttons.push(`
+                    <button class="task-btn btn-primary" onclick="moveTask(${taskId}, 'todo', 'doing')">
+                        Iniciar ▶️
+                    </button>
+                `);
+            } else if (column === 'doing') {
+                buttons.push(`
+                    <button class="task-btn btn-success" onclick="moveTask(${taskId}, 'doing', 'done')">
+                        Concluir ✅
+                    </button>
+                `);
+            }
+
+            // Botão de excluir
+            buttons.push(`
+                <button class="task-btn btn-danger" onclick="deleteTask(${taskId}, '${column}')">
+                    🗑️
+                </button>
+            `);
+
+            return buttons.join('');
+        }
+
+        // ===== BACKUP =====
+
+        /**
+         * Exporta os dados em arquivo JSON
+         */
+        function exportBackup() {
+            try {
+                // Cria objeto com dados e metadados
+                const backup = {
+                    version: '1.0',
+                    exportDate: new Date().toISOString(),
+                    data: kanbanData
+                };
+
+                // Converte para JSON
+                const json = JSON.stringify(backup, null, 2);
+                
+                // Cria blob e link para download
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                // Nome do arquivo com data
+                const date = new Date().toISOString().split('T')[0];
+                const filename = `kanban-backup-${date}.json`;
+                
+                // Cria link temporário e dispara download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                
+                // Limpa o URL temporário
+                URL.revokeObjectURL(url);
+                
+                alert('✅ Backup exportado com sucesso!');
+            } catch (error) {
+                console.error('Erro ao exportar backup:', error);
+                alert('❌ Erro ao exportar backup');
+            }
+        }
+
+        /**
+         * Importa dados de um arquivo JSON
+         */
+        function importBackup(event) {
+            const file = event.target.files[0];
+            
+            if (!file) {
+                return;
+            }
+
+            // Valida tipo do arquivo
+            if (!file.name.endsWith('.json')) {
+                alert('⚠️ Por favor, selecione um arquivo JSON válido');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    
+                    // Valida estrutura do backup
+                    if (!backup.data || !backup.data.todo || !backup.data.doing || !backup.data.done) {
+                        throw new Error('Estrutura de backup inválida');
+                    }
+
+                    // Confirma importação
+                    if (!confirm('⚠️ Isso irá substituir todos os dados atuais. Deseja continuar?')) {
+                        return;
+                    }
+
+                    // Substitui os dados
+                    kanbanData = backup.data;
+                    
+                    // Salva e atualiza interface
+                    saveData();
+                    renderAllColumns();
+                    
+                    alert('✅ Backup importado com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao importar backup:', error);
+                    alert('❌ Erro ao importar backup. Verifique se o arquivo é válido.');
+                }
+            };
+
+            reader.onerror = function() {
+                alert('❌ Erro ao ler o arquivo');
+            };
+
+            reader.readAsText(file);
+            
+            // Limpa o input para permitir reimportar o mesmo arquivo
+            event.target.value = '';
+        }
+
+        // ===== FUNÇÕES AUXILIARES =====
+
+        /**
+         * Capitaliza a primeira letra de uma string
+         */
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        /**
+         * Escapa HTML para prevenir XSS
+         */
+        function escapeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

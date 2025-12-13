@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Pessoal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Kanban Pessoal</h1>
+        <div class="controls">
+            <input type="text" id="newTask" placeholder="Nova tarefa..." maxlength="100">
+            <button onclick="addTask()">Adicionar</button>
+            <button onclick="exportBackup()">Exportar Backup</button>
+            <label for="importFile" class="import-btn">Importar Backup</label>
+            <input type="file" id="importFile" accept=".json" onchange="importBackup(event)" style="display: none;">
+        </div>
+    </header>
+
+    <main class="board">
+        <section class="column" id="todo-column">
+            <h2>A Fazer</h2>
+            <ul id="todo"></ul>
+        </section>
+
+        <section class="column" id="doing-column">
+            <h2>Em Andamento</h2>
+            <ul id="doing"></ul>
+        </section>
+
+        <section class="column" id="done-column">
+            <h2>Concluído</h2>
+            <ul id="done"></ul>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

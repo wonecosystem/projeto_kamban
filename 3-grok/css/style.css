@@ -1,0 +1,138 @@
+/* Reset básico e estilos gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header com controles */
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 1rem;
+}
+
+.controls {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.controls input {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.controls button,
+.import-btn {
+    padding: 0.5rem 1rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.controls button:hover,
+.import-btn:hover {
+    background: #2980b9;
+}
+
+/* Board principal */
+.board {
+    display: flex;
+    justify-content: space-around;
+    padding: 2rem;
+    gap: 1rem;
+    min-height: 70vh;
+}
+
+.column {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 30%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.column h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+/* Lista de tarefas */
+.column ul {
+    list-style: none;
+    min-height: 200px;
+}
+
+.task {
+    background: #ecf0f1;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.task button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.task button:hover {
+    background: #c0392b;
+}
+
+.task button.move-left {
+    background: #f39c12;
+}
+
+.task button.move-left:hover {
+    background: #e67e22;
+}
+
+.task button.move-right {
+    background: #27ae60;
+}
+
+.task button.move-right:hover {
+    background: #229954;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .board {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .column {
+        width: 100%;
+        max-width: 400px;
+    }
+}
